@@ -6,8 +6,12 @@ export const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    text: {
-        fontSize: 20,
-        color: 'darkslateblue',
+    innerContainer:{
+        paddingHorizontal: 20,
+        alignSelf: "stretch",
     },
+    // text: {
+    //     fontSize: 20,
+    //     color: 'darkslateblue',
+    // },
 });

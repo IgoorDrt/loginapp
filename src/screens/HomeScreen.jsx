@@ -5,7 +5,13 @@ export default function HomeScreen() {
   return (
     <View>
       <Text>Bem vinda(o) ao nosso app</Text>
-      <Button>Logout</Button>
+      <Button
+        onPress={() => {
+          navigation.navigate("LoginScreen");
+        }}
+      >
+        Login
+      </Button>
     </View>
   );
 }
