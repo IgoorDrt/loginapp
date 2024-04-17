@@ -38,15 +38,21 @@ export default function RegisterScreen({ navigation }){
                 onChangeText={setRepetirSenha}
                 value={repetirSenha}
             />
-            <TextInput
-                placeholder="Digite seu logradouro"
-                onChangeText={setLogradouro}
-                value={logradouro}
+            <View
+                style={{
+                    paddingVertical: 20,
+                }}
             />
+            <Text>Dados Pessoais</Text>
             <TextInput
                 placeholder="Digite seu CEP"
                 onChangeText={setCep}
                 value={Cep}
+            />
+            <TextInput
+                placeholder="Digite seu logradouro"
+                onChangeText={setLogradouro}
+                value={logradouro}
             />
             <TextInput
                 placeholder="Digite seu cidade"
