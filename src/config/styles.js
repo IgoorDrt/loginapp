@@ -10,6 +10,9 @@ export const styles = StyleSheet.create({
         paddingHorizontal: 20,
         alignSelf: "stretch",
     },
+    input: {
+        marginBottom: 10,
+      },
     // text: {
     //     fontSize: 20,
     //     color: 'darkslateblue',
