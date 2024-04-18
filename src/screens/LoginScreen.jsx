@@ -2,6 +2,7 @@ import { useState } from "react";
 import { View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 import { styles } from "../config/styles";
+import { Image } from "react-native";
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -13,6 +14,10 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
+      <Image
+            source={require("../../assets/login.png")}
+            style={{width: 400, height: 150}}
+          />
       <View style={styles.innerContainer}>
         <Text
           variant="headlineMedium"
@@ -21,6 +26,7 @@ export default function LoginScreen({ navigation }) {
             marginBottom: 20,
           }}
         >
+          
           Faça seu Login
         </Text>
         <TextInput

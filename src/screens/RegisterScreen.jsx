@@ -2,6 +2,7 @@ import { View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 import { useState } from "react";
 import { styles } from "../config/styles";
+import { error } from "console";
 
 export default function RegisterScreen({ navigation }) {
     const [email, setEmail] = useState("");
@@ -18,12 +19,12 @@ export default function RegisterScreen({ navigation }) {
     function realizaRegistro() {
         console.log("Fazer Registro");
         if(!email || !senha || !nome || !repetirSenha || !logradouro || !Cep || !cidade || !estado || !bairro){
-            setErro("Por favor preencha todos os campos");
+            setErro= alert("Por favor preencha todos os campos");
             return;
         }
 
         if (senha !== repetirSenha) {
-            setErro("As senhas não coincidem. Refaça!");
+            setErro= alert("As senhas não coincidem. Refaça!"); 
             return;
           }
           // 3) Enviar os dados para a API do Firestore junto ao Firebase Auth
@@ -99,6 +100,7 @@ export default function RegisterScreen({ navigation }) {
                     onChangeText={setNome}
                     value={nome}
                     style={styles.input}
+                    autoFocus={true}
                 />
                 <TextInput
                     placeholder="Digite seu e-mail"
