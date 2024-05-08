@@ -14,62 +14,108 @@ export default function RegisterScreen({ navigation }) {
     const [cidade, setCidade] = useState("");
     const [estado, setEstado] = useState("");
     const [bairro, setBairro] = useState("");
-    const [erro, setErro] = useState("");
+    const [erro, setErro] = useState({
+        email: false,
+        senha: false,
+        repetirSenha: false,
+        nome: false,
+        Cep: false,
+        cidade: false,
+        estado: false,
+      });
 
     function realizaRegistro() {
-        console.log("Fazer Registro");
-        if(!email || !senha || !nome || !repetirSenha || !logradouro || !Cep || !cidade || !estado || !bairro){
-            setErro= alert("Por favor preencha todos os campos");
-            return;
-        }
+        // console.log("Fazer Registro");
+        // if(!email || !senha || !nome || !repetirSenha || !logradouro || !Cep || !cidade || !estado || !bairro){
+        //     setErro= alert("Por favor preencha todos os campos");
+        //     return;
+        // }
 
         if (senha !== repetirSenha) {
             setErro= alert("As senhas não coincidem. Refaça!"); 
             return;
           }
+        if (nome === "") {
+            setErro({ ...erro, nome: true });
+            return;
+          }
+          setErro({ ...erro, nome: false });
+          if (email === "") {
+            setErro({ ...erro, email: true });
+            return;
+          }
+          setErro({ ...erro, email: false });
+          if (senha === "") {
+            setErro({ ...erro, senha: true });
+            return;
+          }
+          setErro({ ...erro, senha: false });
+          if (repetirSenha === "") {
+            setErro({ ...erro, repetirSenha: true });
+            return;
+          }
+          setErro({ ...erro, repetirSenha: false });
+          if (Cep === "") {
+            setErro({ ...erro, Cep: true });
+            return;
+          }
+          setErro({ ...erro, Cep: false });
+          if (cidade === "") {
+            setErro({ ...erro, cidade: true });
+            return;
+          }
+          setErro({ ...erro, cidade: false });
+          if (estado === "") {
+            setErro({ ...erro, estado: true });
+            return;
+          }
+          setErro({ ...erro, estado: false });
+
+
+
           // 3) Enviar os dados para a API do Firestore junto ao Firebase Auth
           // 4) Tratar os erros
           // 5) Redirecionar para a tela de Login
-          fetch("URL_DA_API", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              email: email,
-              senha: senha,
-              nome: nome,
-              logradouro: logradouro,
-              cep: Cep,
-              cidade: cidade,
-              estado: estado
-            }),
-          })
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error('Erro ao registrar. Por favor, tente novamente.');
-              }
-              return response.json();
-            })
-            .then((data) => {
-              console.log("Sucesso:", data);
-              // Limpar os campos após o registro bem-sucedido (opcional)
-              setEmail("");
-              setSenha("");
-              setRepetirSenha("");
-              setNome("");
-              setLogradouro("");
-              setCep("");
-              setCidade("");
-              setEstado("");
-              setErro("");
-              // Redirecionar para a tela de Login após o registro bem-sucedido
-              navigation.navigate("LoginScreen");
-            })
-            .catch((error) => {
-              console.error("Erro:", error.message);
-              setErro(error.message);
-            });
+        //   fetch("URL_DA_API", {
+        //     method: "POST",
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //     },
+        //     body: JSON.stringify({
+        //       email: email,
+        //       senha: senha,
+        //       nome: nome,
+        //       logradouro: logradouro,
+        //       cep: Cep,
+        //       cidade: cidade,
+        //       estado: estado
+        //     }),
+        //   })
+        //     .then((response) => {
+        //       if (!response.ok) {
+        //         throw new Error('Erro ao registrar. Por favor, tente novamente.');
+        //       }
+        //       return response.json();
+        //     })
+        //     .then((data) => {
+        //       console.log("Sucesso:", data);
+        //       // Limpar os campos após o registro bem-sucedido (opcional)
+        //       setEmail("");
+        //       setSenha("");
+        //       setRepetirSenha("");
+        //       setNome("");
+        //       setLogradouro("");
+        //       setCep("");
+        //       setCidade("");
+        //       setEstado("");
+        //       setErro("");
+        //       // Redirecionar para a tela de Login após o registro bem-sucedido
+        //       navigation.navigate("LoginScreen");
+        //     })
+        //     .catch((error) => {
+        //       console.error("Erro:", error.message);
+        //       setErro(error.message);
+        //     });
     }
 
 

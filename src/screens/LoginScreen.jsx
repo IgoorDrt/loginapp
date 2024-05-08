@@ -1,23 +1,35 @@
 import { useState } from "react";
 import { View } from "react-native";
-import { Button, Text, TextInput } from "react-native-paper";
+import { Button, Surface, Text, TextInput } from "react-native-paper";
 import { styles } from "../config/styles";
-import { Image } from "react-native";
+
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [erro, setErro] = useState({
+    email: false,
+    senha: false,
+  });
 
   function realizaLogin() {
     console.log("Fazer Login");
+    if(email === ""){
+      setErro({ ...erro, email:true});
+    } else{
+      setErro({ ...erro, email: false});
+    }
+
+    if(senha === ""){
+      setErro({ ...erro, senha:true});
+    } else{
+      setErro({ ...erro, senha: false});
+    }
   }
 
   return (
-    <View style={styles.container}>
-      <Image
-            source={require("../../assets/login.png")}
-            style={{width: 400, height: 150}}
-          />
+    <Surface style={styles.container}>
+      
       <View style={styles.innerContainer}>
         <Text
           variant="headlineMedium"
@@ -51,6 +63,6 @@ export default function LoginScreen({ navigation }) {
           Faça seu cadastro
         </Button>
       </View>
-    </View>
+    </Surface>
   );
 }
