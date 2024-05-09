@@ -2,7 +2,9 @@ import { View } from "react-native";
 import { Button, Text, TextInput } from "react-native-paper";
 import { useState } from "react";
 import { styles } from "../config/styles";
-import { error } from "console";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../config/firebase";
+
 
 export default function RegisterScreen({ navigation }) {
     const [email, setEmail] = useState("");
@@ -25,16 +27,7 @@ export default function RegisterScreen({ navigation }) {
       });
 
     function realizaRegistro() {
-        // console.log("Fazer Registro");
-        // if(!email || !senha || !nome || !repetirSenha || !logradouro || !Cep || !cidade || !estado || !bairro){
-        //     setErro= alert("Por favor preencha todos os campos");
-        //     return;
-        // }
-
-        if (senha !== repetirSenha) {
-            setErro= alert("As senhas não coincidem. Refaça!"); 
-            return;
-          }
+       
         if (nome === "") {
             setErro({ ...erro, nome: true });
             return;
@@ -71,53 +64,27 @@ export default function RegisterScreen({ navigation }) {
           }
           setErro({ ...erro, estado: false });
 
+          if (senha !== repetirSenha) {
+            setErro({ ...erro, senha: true, repetirSenha: true });
+            return;
+          }
+          setErro({ ...erro, senha: false, repetirSenha: false });
 
-
-          // 3) Enviar os dados para a API do Firestore junto ao Firebase Auth
-          // 4) Tratar os erros
-          // 5) Redirecionar para a tela de Login
-        //   fetch("URL_DA_API", {
-        //     method: "POST",
-        //     headers: {
-        //       "Content-Type": "application/json",
-        //     },
-        //     body: JSON.stringify({
-        //       email: email,
-        //       senha: senha,
-        //       nome: nome,
-        //       logradouro: logradouro,
-        //       cep: Cep,
-        //       cidade: cidade,
-        //       estado: estado
-        //     }),
-        //   })
-        //     .then((response) => {
-        //       if (!response.ok) {
-        //         throw new Error('Erro ao registrar. Por favor, tente novamente.');
-        //       }
-        //       return response.json();
-        //     })
-        //     .then((data) => {
-        //       console.log("Sucesso:", data);
-        //       // Limpar os campos após o registro bem-sucedido (opcional)
-        //       setEmail("");
-        //       setSenha("");
-        //       setRepetirSenha("");
-        //       setNome("");
-        //       setLogradouro("");
-        //       setCep("");
-        //       setCidade("");
-        //       setEstado("");
-        //       setErro("");
-        //       // Redirecionar para a tela de Login após o registro bem-sucedido
-        //       navigation.navigate("LoginScreen");
-        //     })
-        //     .catch((error) => {
-        //       console.error("Erro:", error.message);
-        //       setErro(error.message);
-        //     });
+        cadastrarNoFirebase();
     }
-
+    async function cadastrarNoFirebase(){
+        try{
+            const userCredential = await createUserWithEmailAndPassword(
+                auth,
+                email,
+                senha
+            );
+            const user = userCredential.user;
+            console.log("Usuário cadastrado", user);
+        }catch(error){
+            console.error(error);
+        }
+    }
 
     function buscaCEP() {
         console.log("Busca CEP");
