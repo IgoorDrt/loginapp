@@ -2,6 +2,8 @@ import { useState } from "react";
 import { View } from "react-native";
 import { Button, Surface, Text, TextInput } from "react-native-paper";
 import { styles } from "../config/styles";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../config/firebase";
 
 
 export default function LoginScreen({ navigation }) {
@@ -16,14 +18,26 @@ export default function LoginScreen({ navigation }) {
     console.log("Fazer Login");
     if(email === ""){
       setErro({ ...erro, email:true});
+      return;
     } else{
       setErro({ ...erro, email: false});
     }
 
     if(senha === ""){
       setErro({ ...erro, senha:true});
+      return;
     } else{
       setErro({ ...erro, senha: false});
+    }
+    realizaLoginNoFirebase();
+  }
+
+  async function realizaLoginNoFirebase() {
+    try {
+      const usuarioRef = await signInWithEmailAndPassword(auth, email, senha);
+      console.log(usuarioRef);
+    } catch (erro) {
+      console.log(erro);
     }
   }
 

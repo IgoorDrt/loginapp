@@ -1,9 +1,10 @@
 import { View } from "react-native";
-import { Button, Text, TextInput } from "react-native-paper";
+import { Button, Surface, Text, TextInput } from "react-native-paper";
 import { useState } from "react";
 import { styles } from "../config/styles";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../config/firebase";
+import { auth, db} from "../config/firebase";
+import { collection } from "firebase/firestore";
 
 
 export default function RegisterScreen({ navigation }) {
@@ -81,6 +82,18 @@ export default function RegisterScreen({ navigation }) {
             );
             const user = userCredential.user;
             console.log("Usuário cadastrado", user);
+
+            const collectionRef = collection(db, "Usuarios");
+
+            const docRef = await setDoc(doc(collectionRef,user.uid),{
+                nome: nome,
+                logradouro: logradouro,
+                Cep: Cep,
+                cidade: cidade,
+                estado: estado,
+                bairro: bairro,
+            });
+
         }catch(error){
             console.error(error);
         }
@@ -105,7 +118,7 @@ export default function RegisterScreen({ navigation }) {
     }
 
     return (
-        <View style={styles.container}>
+        <Surface style={styles.container}>
             <View style={styles.innerContainer}>
                 <Text variant="headlineSmall">Faça seu Registro</Text>
                 <TextInput
@@ -194,6 +207,6 @@ export default function RegisterScreen({ navigation }) {
                     Voltar ao login
                 </Button>
             </View>
-        </View>
+        </Surface>
     );
 }
