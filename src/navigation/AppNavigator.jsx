@@ -25,7 +25,7 @@ export default function AppNavigator() {
           component={LoginScreen}
           options={{
             title: "Login",
-            headerLeft: () => null, 
+            headerLeft: () => null, // This removes the back button
           }}
         />
 
@@ -33,14 +33,14 @@ export default function AppNavigator() {
           name="RegisterScreen"
           component={RegisterScreen}
           options={{
-            title: "Inicial",
+            title: "Cadastro de usuário",
           }}
         />
         <Stack.Screen
           name="HomeScreen"
-          component={HomeScreen}
+          component={TabsNavigation}
           options={{
-            title: "Inicial",
+            headerShown: false,
           }}
         />
       </Stack.Navigator>
@@ -50,11 +50,10 @@ export default function AppNavigator() {
 
 const Tabs = createMaterialBottomTabNavigator();
 
-function TabsNavigation() {
+export function TabsNavigation() {
   return (
     <Tabs.Navigator>
       <Tabs.Screen name="Home" component={HomeScreen} />
     </Tabs.Navigator>
   );
-  
 }
