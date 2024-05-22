@@ -1,212 +1,263 @@
 import { View } from "react-native";
-import { Button, Surface, Text, TextInput } from "react-native-paper";
+import {Button, Surface, Text, TextInput, Modal, Portal} from "react-native-paper";
 import { useState } from "react";
 import { styles } from "../config/styles";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth, db} from "../config/firebase";
-import { collection } from "firebase/firestore";
-
+import { auth, db } from "../config/firebase";
+import { collection, doc, setDoc } from "firebase/firestore";
 
 export default function RegisterScreen({ navigation }) {
-    const [email, setEmail] = useState("");
-    const [senha, setSenha] = useState("");
-    const [nome, setNome] = useState("");
-    const [repetirSenha, setRepetirSenha] = useState("");
-    const [logradouro, setLogradouro] = useState("");
-    const [Cep, setCep] = useState("");
-    const [cidade, setCidade] = useState("");
-    const [estado, setEstado] = useState("");
-    const [bairro, setBairro] = useState("");
-    const [erro, setErro] = useState({
-        email: false,
-        senha: false,
-        repetirSenha: false,
-        nome: false,
-        Cep: false,
-        cidade: false,
-        estado: false,
-      });
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [repetirSenha, setRepetirSenha] = useState("");
+  const [nome, setNome] = useState("");
+  const [logradouro, setLogradouro] = useState("");
+  const [cep, setCep] = useState("");
+  const [cidade, setCidade] = useState("");
+  const [estado, setEstado] = useState("");
+  const [erro, setErro] = useState({
+    email: false,
+    senha: false,
+    repetirSenha: false,
+    nome: false,
+    logradouro: false,
+    cep: false,
+    cidade: false,
+    estado: false,
+  });
 
-    function realizaRegistro() {
-       
-        if (nome === "") {
-            setErro({ ...erro, nome: true });
-            return;
-          }
-          setErro({ ...erro, nome: false });
-          if (email === "") {
-            setErro({ ...erro, email: true });
-            return;
-          }
-          setErro({ ...erro, email: false });
-          if (senha === "") {
-            setErro({ ...erro, senha: true });
-            return;
-          }
-          setErro({ ...erro, senha: false });
-          if (repetirSenha === "") {
-            setErro({ ...erro, repetirSenha: true });
-            return;
-          }
-          setErro({ ...erro, repetirSenha: false });
-          if (Cep === "") {
-            setErro({ ...erro, Cep: true });
-            return;
-          }
-          setErro({ ...erro, Cep: false });
-          if (cidade === "") {
-            setErro({ ...erro, cidade: true });
-            return;
-          }
-          setErro({ ...erro, cidade: false });
-          if (estado === "") {
-            setErro({ ...erro, estado: true });
-            return;
-          }
-          setErro({ ...erro, estado: false });
+  const [visible, setVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-          if (senha !== repetirSenha) {
-            setErro({ ...erro, senha: true, repetirSenha: true });
-            return;
-          }
-          setErro({ ...erro, senha: false, repetirSenha: false });
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
 
-        cadastrarNoFirebase();
+  function realizaRegistro() {
+    console.log("Fazer Registro");
+
+    if (nome === "") {
+      setErro({ ...erro, nome: true });
+      setErrorMessage("Nome é obrigatório.");
+      showModal();
+      return;
     }
-    async function cadastrarNoFirebase(){
-        try{
-            const userCredential = await createUserWithEmailAndPassword(
-                auth,
-                email,
-                senha
-            );
-            const user = userCredential.user;
-            console.log("Usuário cadastrado", user);
+    setErro({ ...erro, nome: false });
 
-            const collectionRef = collection(db, "Usuarios");
+    if (email === "") {
+      setErro({ ...erro, email: true });
+      setErrorMessage("Email é obrigatório.");
+      showModal();
+      return;
+    }
+    setErro({ ...erro, email: false });
 
-            const docRef = await setDoc(doc(collectionRef,user.uid),{
-                nome: nome,
-                logradouro: logradouro,
-                Cep: Cep,
-                cidade: cidade,
-                estado: estado,
-                bairro: bairro,
-            });
+    if (senha === "") {
+      setErro({ ...erro, senha: true });
+      setErrorMessage("Senha é obrigatória.");
+      showModal();
+      return;
+    }
+    setErro({ ...erro, senha: false });
 
-        }catch(error){
-            console.error(error);
+    if (repetirSenha === "") {
+      setErro({ ...erro, repetirSenha: true });
+      setErrorMessage("Repetir senha é obrigatório.");
+      showModal();
+      return;
+    }
+    setErro({ ...erro, repetirSenha: false });
+
+    if (senha !== repetirSenha) {
+      setErro({ ...erro, senha: true, repetirSenha: true });
+      setErrorMessage("As senhas não coincidem.");
+      showModal();
+      return;
+    }
+    setErro({ ...erro, senha: false, repetirSenha: false });
+
+    if (cep === "") {
+      setErro({ ...erro, cep: true });
+      setErrorMessage("CEP é obrigatório.");
+      showModal();
+      return;
+    }
+    setErro({ ...erro, cep: false });
+
+    if (cidade === "") {
+      setErro({ ...erro, cidade: true });
+      setErrorMessage("Cidade é obrigatória.");
+      showModal();
+      return;
+    }
+    setErro({ ...erro, cidade: false });
+
+    if (estado === "") {
+      setErro({ ...erro, estado: true });
+      setErrorMessage("Estado é obrigatório.");
+      showModal();
+      return;
+    }
+    setErro({ ...erro, estado: false });
+
+    cadastrarNoFirebase();
+  }
+
+  
+  async function cadastrarNoFirebase() {
+    try {
+      
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        senha
+      );
+      
+      const user = userCredential.user;
+
+      console.log("Usuário cadastrado", user);
+
+     
+      const collectionRef = collection(db, "usuarios");
+
+      
+      await setDoc(
+        doc(
+          collectionRef, 
+          user.uid 
+        ),
+        {
+          nome: nome,
+          email: email,
+          logradouro: logradouro,
+          cep: cep,
+          cidade: cidade,
+          estado: estado,
         }
-    }
+      );
 
-    function buscaCEP() {
-        console.log("Busca CEP");
-        let cepLimpo = Cep.replace("-", "").trim();
-        fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`)
-            .then((res) => res.json())
-            .then((dados) => {
-                console.log(dados);
-                setLogradouro(dados.logradouro);
-                setCidade(dados.localidade);
-                setEstado(dados.uf);
-                setBairro(dados.bairro);
-            })
-            .catch((erro) => {
-                console.log(erro);
-                setErro("CEP não encontrado");
-            });
+     
+      navigation.navigate("LoginScreen");
+    } catch (error) {
+      if (error.code === "auth/email-already-in-use") {
+        setErrorMessage("Email já está cadastrado.");
+      } else {
+        setErrorMessage("Erro ao cadastrar usuário: " + error.message);
+      }
+      showModal();
     }
+  }
 
-    return (
-        <Surface style={styles.container}>
-            <View style={styles.innerContainer}>
-                <Text variant="headlineSmall">Faça seu Registro</Text>
-                <TextInput
-                    placeholder="Digite seu Nome Completo"
-                    onChangeText={setNome}
-                    value={nome}
-                    style={styles.input}
-                    autoFocus={true}
-                />
-                <TextInput
-                    placeholder="Digite seu e-mail"
-                    onChangeText={setEmail}
-                    value={email}
-                    style={styles.input}
-                />
-                <TextInput
-                    secureTextEntry={true}
-                    placeholder="Digite sua senha"
-                    onChangeText={setSenha}
-                    value={senha}
-                    style={styles.input}
-                />
-                <TextInput
-                    secureTextEntry={true}
-                    placeholder="Digite sua senha novamente"
-                    onChangeText={setRepetirSenha}
-                    value={repetirSenha}
-                    style={styles.input}
-                />
-                <View
-                    style={{
-                        paddingVertical: 20,
-                    }}
-                >
-                <Text variant="headlineSmall">Dados Pessoais</Text>
-                <TextInput
-                    placeholder="Digite seu CEP(somente números)"
-                    onChangeText={setCep}
-                    value={Cep}
-                    onBlur={buscaCEP}
-                    style={styles.input}
-                    keyboardType="numeric"
-                    maxLength={8}
-                />
-                <TextInput
-                    placeholder="Digite seu logradouro"
-                    onChangeText={setLogradouro}
-                    value={logradouro}
-                    style={styles.input}
-                />
-                <View
-                    style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                    }}
-                >
-                <TextInput
-                    placeholder="Digite seu cidade"
-                    onChangeText={setCidade}
-                    value={cidade}
-                    style={{
-                        ...styles.input,
-                        width: "70%",
-                    }}
-                />
-                <TextInput
-                    placeholder="Digite seu estado"
-                    onChangeText={setEstado}
-                    value={estado}
-                    style={{
-                        ...styles.input,
-                        width: "30%",
-                    }}
-                    maxLength={2}
-                />
-                <TextInput
-                    placeholder="Digite seu bairro"
-                    onChangeText={setBairro}
-                    value={bairro}
-                    style={styles.input}
-                />
-                </View>
-                </View>
-                <Button onPress={realizaRegistro} mode="outlined">Registrar</Button>
-                <Button onPress={() => navigation.navigate("LoginScreen")}>
-                    Voltar ao login
-                </Button>
-            </View>
-        </Surface>
-    );
+  function buscaCEP() {
+    console.log("Busca CEP");
+    let cepLimpo = cep.replace("-", "").trim();
+    if (cepLimpo.length < 8) return;
+    fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`)
+      .then((res) => res.json())
+      .then((dados) => {
+        console.log(dados);
+        setLogradouro(dados.logradouro);
+        setCidade(dados.localidade);
+        setEstado(dados.uf);
+      })
+      .catch((erro) => {
+        console.error(erro);
+        setErrorMessage("CEP não encontrado");
+        showModal();
+      });
+  }
+
+  return (
+    <Surface style={styles.container}>
+      <View style={styles.innerContainer}>
+        {/* Modal */}
+        <Portal>
+          <Modal
+            visible={visible}
+            onDismiss={hideModal}
+            contentContainerStyle={{ backgroundColor: "white", padding: 20 }}
+          >
+            <Text>{errorMessage}</Text>
+            <Button onPress={hideModal}>Fechar</Button>
+          </Modal>
+        </Portal>
+        {/* FIM Modal */}
+        <Text variant="headlineSmall">Faça seu Registro</Text>
+        <TextInput
+          placeholder="Digite seu nome"
+          value={nome}
+          onChangeText={setNome}
+          style={styles.input}
+          error={erro.nome}
+        />
+        <TextInput
+          placeholder="Digite seu email"
+          value={email}
+          onChangeText={setEmail}
+          style={styles.input}
+          error={erro.email}
+        />
+        <TextInput
+          placeholder="Digite sua senha"
+          value={senha}
+          onChangeText={setSenha}
+          secureTextEntry
+          style={styles.input}
+          error={erro.senha}
+        />
+        <TextInput
+          placeholder="Repita sua senha"
+          value={repetirSenha}
+          onChangeText={setRepetirSenha}
+          secureTextEntry
+          style={styles.input}
+          error={erro.repetirSenha}
+        />
+        <View style={{ paddingVertical: 20 }}>
+          <Text variant="headlineSmall">Dados pessoais</Text>
+          <TextInput
+            placeholder="Digite seu CEP (somente números)"
+            value={cep}
+            onChangeText={setCep}
+            onBlur={buscaCEP}
+            keyboardType="numeric"
+            style={styles.input}
+            maxLength={8}
+            error={erro.cep}
+          />
+          <TextInput
+            placeholder="Logradouro"
+            value={logradouro}
+            onChangeText={setLogradouro}
+            style={styles.input}
+            error={erro.logradouro}
+          />
+          <View
+            style={{ flexDirection: "row", justifyContent: "space-between" }}
+          >
+            <TextInput
+              placeholder="Cidade"
+              value={cidade}
+              onChangeText={setCidade}
+              style={{ ...styles.input, width: "70%" }}
+              error={erro.cidade}
+            />
+            <TextInput
+              placeholder="Estado"
+              value={estado}
+              onChangeText={setEstado}
+              style={{ ...styles.input, width: "30%" }}
+              maxLength={2}
+              error={erro.estado}
+            />
+          </View>
+        </View>
+        <Button onPress={realizaRegistro} mode="outlined">
+          Registrar
+        </Button>
+        <Button onPress={() => navigation.navigate("LoginScreen")}>
+          Voltar ao login
+        </Button>
+      </View>
+    </Surface>
+  );
 }

@@ -4,7 +4,7 @@ import { styles } from "../config/styles";
 export default function HomeScreen({ navigation }) {
   return (
     <Surface style={styles.container}>
-      <Text>Bem vinda(o) ao nosso app</Text>
+      <Text>Bem vindo(a) ao nosso app</Text>
       <Button
         onPress={() => {
           navigation.navigate("LoginScreen");

@@ -1,10 +1,9 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { View } from "react-native";
-import { Button, Surface, Text, TextInput } from "react-native-paper";
+import {Button,Surface,Text,TextInput,Modal,Portal} from "react-native-paper";
 import { styles } from "../config/styles";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../config/firebase";
-
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState("");
@@ -13,21 +12,29 @@ export default function LoginScreen({ navigation }) {
     email: false,
     senha: false,
   });
+  const [visible, setVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
 
   function realizaLogin() {
     console.log("Fazer Login");
-    if(email === ""){
-      setErro({ ...erro, email:true});
+    if (email === "") {
+      setErro({ ...erro, email: true });
+      setErrorMessage("Email é obrigatório.");
+      showModal();
       return;
-    } else{
-      setErro({ ...erro, email: false});
+    } else {
+      setErro({ ...erro, email: false });
     }
-
-    if(senha === ""){
-      setErro({ ...erro, senha:true});
+    if (senha === "") {
+      setErro({ ...erro, senha: true });
+      setErrorMessage("Senha é obrigatória.");
+      showModal();
       return;
-    } else{
-      setErro({ ...erro, senha: false});
+    } else {
+      setErro({ ...erro, senha: false });
     }
     realizaLoginNoFirebase();
   }
@@ -36,15 +43,35 @@ export default function LoginScreen({ navigation }) {
     try {
       const usuarioRef = await signInWithEmailAndPassword(auth, email, senha);
       console.log(usuarioRef);
-    } catch (erro) {
-      console.log(erro);
+      
+      navigation.navigate("HomeScreen");
+    } catch (error) {
+      if (error.code === "auth/user-not-found") {
+        setErrorMessage("Usuário não encontrado.");
+      } else if (error.code === "auth/wrong-password") {
+        setErrorMessage("Senha incorreta.");
+      } else {
+        setErrorMessage("Erro ao fazer login: " + error.message);
+      }
+      showModal();
     }
   }
 
   return (
     <Surface style={styles.container}>
-      
       <View style={styles.innerContainer}>
+        {/* Modal */}
+        <Portal>
+          <Modal
+            visible={visible}
+            onDismiss={hideModal}
+            contentContainerStyle={{ backgroundColor: "white", padding: 20 }}
+          >
+            <Text>{errorMessage}</Text>
+            <Button onPress={hideModal}>Fechar</Button>
+          </Modal>
+        </Portal>
+        {/* FIM Modal */}
         <Text
           variant="headlineMedium"
           style={{
@@ -52,7 +79,6 @@ export default function LoginScreen({ navigation }) {
             marginBottom: 20,
           }}
         >
-          
           Faça seu Login
         </Text>
         <TextInput
@@ -60,6 +86,7 @@ export default function LoginScreen({ navigation }) {
           onChangeText={setEmail}
           value={email}
           style={styles.input}
+          error={erro.email}
         />
         <TextInput
           placeholder="Digite sua senha"
@@ -67,6 +94,7 @@ export default function LoginScreen({ navigation }) {
           value={senha}
           secureTextEntry // faz com que o campo seja senha com *
           style={styles.input}
+          error={erro.senha}
         />
         <View>
           <Button onPress={realizaLogin} mode="contained">
